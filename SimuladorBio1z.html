@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Simulador Técnico de Biodigestor - IFSP</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#eef2f3;
+    margin:0;
+}
+
+header{
+    background:#0b6623;
+    color:white;
+    padding:25px;
+    text-align:center;
+}
+
+header img{
+    height:85px;
+    display:block;
+    margin:0 auto 15px auto;
+}
+
+header h1{
+    margin:5px 0;
+    font-size:26px;
+}
+
+header p{
+    margin:0;
+    font-size:14px;
+}
+
+.container{
+    width:900px;
+    margin:30px auto;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.1);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+label{
+    font-weight:bold;
+}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin:5px 0 15px 0;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:5px;
+    margin-top:5px;
+    transition:0.3s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.btn-calc{
+    background:#27ae60;
+}
+
+.btn-ia{
+    background:#2980b9;
+}
+
+.btn-info{
+    background:#555;
+}
+
+textarea{
+    width:100%;
+    height:160px;
+    margin-top:10px;
+    padding:10px;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    z-index:1;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.6);
+}
+
+.modal-content{
+    background:white;
+    margin:5% auto;
+    padding:30px;
+    width:70%;
+    border-radius:10px;
+    max-height:80vh;
+    overflow-y:auto;
+}
+
+.close{
+    float:right;
+    font-size:22px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#222;
+    color:white;
+    margin-top:30px;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    
+    <h1>Simulador Técnico de Biodigestor</h1>
+    <p>Instituto Federal de Educação, Ciência e Tecnologia de São Paulo</p>
+    <p>Campus Catanduva</p>
+</header>
+
+<div class="container">
+
+
+<label>Tipo de Resíduo:</label>
+<select id="residuo">
+    <option value="">Selecione</option>
+    <option value="0.25">Esterco Bovino</option>
+    <option value="0.35">Esterco Suíno</option>
+    <option value="0.40">Esterco de Aves</option>
+    <option value="0.20">Resíduo Vegetal</option>
+    <option value="0.30">Orgânico Doméstico</option>
+</select>
+
+<label>Quantidade diária (kg):</label>
+<input type="number" id="massa">
+
+<label>Temperatura (°C):</label>
+<input type="number" id="temp">
+
+<label>pH:</label>
+<input type="number" id="ph" step="0.1">
+
+<label>Tempo de Retenção (dias):</label>
+<input type="number" id="dias">
+
+<label>Eficiência Elétrica (%):</label>
+<input type="number" id="eficiencia">
+
+<label>Valor da Energia (R$/kWh):</label>
+<input type="number" id="valor" step="0.01">
+
+<button class="btn-calc" onclick="calcular()">Calcular Produção</button>
+<button class="btn-info" onclick="abrirModal()">Como os cálculos foram realizados?</button>
+
+<textarea id="resultado" placeholder="Resultado técnico..."></textarea>
+
+<label>Perguntar ao Assistente Técnico:</label>
+<input type="text" id="pergunta">
+
+<button class="btn-ia" onclick="assistente()">Perguntar</button>
+
+<textarea id="respostaIA" placeholder="Análise inteligente..."></textarea>
+
+</div>
+
+<div id="modalCalculos" class="modal">
+<div class="modal-content">
+<span class="close" onclick="fecharModal()">&times;</span>
+
+<h2>Fundamentação Matemática do Modelo</h2>
+
+<p><strong>Produção acumulada de biogás:</strong></p>
+<p>Biogás = m × B₀ × (1 − e<sup>−k·t</sup>) × f(T) × f(pH)</p>
+
+<ul>
+<li>m = massa diária (kg)</li>
+<li>B₀ = potencial metanogênico (m³/kg)</li>
+<li>k = constante cinética (0,15)</li>
+<li>t = tempo de retenção (dias)</li>
+<li>f(T) = fator de temperatura</li>
+<li>f(pH) = fator de pH</li>
+</ul>
+
+<p><strong>Energia elétrica gerada:</strong></p>
+<p>Energia (kWh) = Biogás × 6 × Eficiência</p>
+
+<p><strong>Retorno financeiro:</strong></p>
+<p>Retorno (R$) = Energia × Valor do kWh</p>
+
+<p>Modelo baseado em cinética de primeira ordem aplicada à digestão anaeróbica.</p>
+
+</div>
+</div>
+
+<footer>
+Projeto Acadêmico | IFSP Campus Catanduva | 2026
+
+<br><br>
+<span style="font-size:11px;">
+Desenvolvedores: <br>
+Leandro Henrique da Silva <br>
+Vinícius Alexandre Pereira<br>
+Luan Michel de Souza Araújo
+
+</span>
+
+</footer>
+
+<script>
+
+const K_CINETICO = 0.15;
+const PCI_BIOGAS = 6;
+
+function fatorTemperatura(t){
+    if(t>=30 && t<=40) return 1;
+    if(t>=20) return 0.75;
+    return 0.5;
+}
+
+function fatorPH(p){
+    if(p>=6.8 && p<=7.2) return 1;
+    if((p>=6.5 && p<6.8)||(p>7.2 && p<=7.8)) return 0.8;
+    return 0.5;
+}
+
+function calcular(){
+    let m=parseFloat(document.getElementById("massa").value);
+    let t=parseFloat(document.getElementById("temp").value);
+    let p=parseFloat(document.getElementById("ph").value);
+    let d=parseFloat(document.getElementById("dias").value);
+    let e=parseFloat(document.getElementById("eficiencia").value)/100;
+    let v=parseFloat(document.getElementById("valor").value);
+    let B0=parseFloat(document.getElementById("residuo").value);
+
+    if(!m||!t||!p||!d||!e||!v||!B0){
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    let gas = m*B0*(1-Math.exp(-K_CINETICO*d))*fatorTemperatura(t)*fatorPH(p);
+    let energia = gas*PCI_BIOGAS*e;
+    let ganho = energia*v;
+
+    document.getElementById("resultado").value=
+    "Produção de Biogás: "+gas.toFixed(2)+" m³\n"+
+    "Energia Gerada: "+energia.toFixed(2)+" kWh\n"+
+    "Retorno Financeiro: R$ "+ganho.toFixed(2);
+}
+
+function assistente(){
+    let pergunta=document.getElementById("pergunta").value.toLowerCase();
+    let frases=[
+        "O sistema apresenta comportamento bioquímico consistente.",
+        "Recomenda-se monitoramento preventivo.",
+        "A estabilidade depende do equilíbrio microbiológico.",
+        "A eficiência energética pode ser otimizada."
+    ];
+
+    let resposta="Análise Técnica:\n\n";
+    resposta+=frases[Math.floor(Math.random()*frases.length)]+"\n\n";
+
+    if(pergunta.includes("melhorar"))
+        resposta+="Sugestão: otimizar temperatura e tempo de retenção.";
+    else if(pergunta.includes("lucro"))
+        resposta+="O lucro depende da eficiência elétrica e escala.";
+    else if(pergunta.includes("dimensionar"))
+        resposta+="Dimensionamento depende da carga orgânica diária.";
+    else
+        resposta+="Análise baseada nos parâmetros inseridos.";
+
+    document.getElementById("respostaIA").value=resposta;
+}
+
+function abrirModal(){
+    document.getElementById("modalCalculos").style.display="block";
+}
+
+function fecharModal(){
+    document.getElementById("modalCalculos").style.display="none";
+}
+
+window.onclick = function(event){
+    let modal = document.getElementById("modalCalculos");
+    if(event.target == modal){
+        modal.style.display = "none";
+    }
+}
+
+</script>
+
+</body>
+</html>
